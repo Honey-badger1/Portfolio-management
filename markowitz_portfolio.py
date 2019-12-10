@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 22 14:15:03 2019
-
-@author: Asus
-"""
 import pandas as pd 
 import matplotlib.pyplot as plt
 from matplotlib import style
+from matplotlib.patches import Shadow
 
-style.use('ggplot')
+style.use('seaborn')
 df=pd.read_csv('smport.csv', index_col='Date', parse_dates=True)
 print(df.head(10))
 df.info()
@@ -50,9 +45,30 @@ print (raw_weights_maxsharpe, cleaned_weights_maxsharpe)
 ef.portfolio_performance(verbose=True)
 size=list(cleaned_weights_maxsharpe.values())
 print(size)
-plt.pie(size,labels=l,autopct='%1.1f%%')
-plt.title('Max Return')
+import matplotlib as mpl
+mpl.rcParams['font.size'] = 20.0
+fig = plt.figure(figsize=(12, 12))
+ax = fig.add_axes([0.0, 0.0, 0.8, 0.8])
+explode = (0, 0, 0.05, 0, 0, 0)
+pies=ax.pie(size, explode=explode,labels=l, labeldistance=1.2, autopct='%1.1f%%', startangle=90, textprops={'fontsize': 16})
+plt.title("Markovitz' portfolio with maximum return", fontsize=36)
+for w in pies[0]:
+    # set the id with the label.
+    w.set_gid(w.get_label())
+
+    # we don't want to draw the edge of the pie
+    w.set_edgecolor("none")
+
+for w in pies[0]:
+    # create shadow patch
+    s = Shadow(w, -0.01, -0.01)
+    s.set_gid(w.get_gid() + "_shadow")
+    s.set_zorder(w.get_zorder() - 0.1)
+    ax.add_patch(s)
 plt.show()
+fig.savefig("Markovitz' portfolio with maximum return.png")
+
+
 # Calculating weights for the minimum volatility portfolio
 raw_weights_minvol = ef.min_volatility()
 cleaned_weights_minvol = ef.clean_weights()
@@ -80,6 +96,3 @@ print(size)
 plt.pie(size,labels=l,autopct='%1.1f%%')
 plt.title('Max Return EW')
 plt.show()
-
-
-
